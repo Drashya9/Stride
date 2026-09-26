@@ -315,7 +315,12 @@ function Labels({ slug }: { slug: string }) {
   const isAdmin = hasRole(board.role, "admin");
 
   return (
-    <Section title="Labels" description="Color-coded tags you can add to issues." icon={Tag} tone="bg-pink-500/12 text-pink-600 dark:text-pink-300">
+    <Section
+      title="Labels"
+      description={isAdmin ? "Color-coded tags you can add to issues." : "Color-coded tags you can add to issues. Only admins can create or delete labels."}
+      icon={Tag}
+      tone="bg-pink-500/12 text-pink-600 dark:text-pink-300"
+    >
       <div className="flex flex-wrap gap-2">
         {board.labels.map((l) => (
           <span key={l.id} className="inline-flex items-center gap-1">
