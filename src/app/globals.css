@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #ffffff;
+  --subtle: #f6f6f9;
+  --panel: #ffffff;
+  --hover: #f0f0f2;
+  --border: #e6e6e9;
+  --border-strong: #d4d4d8;
+  --text: #18181b;
+  --muted: #6b6b76;
+  --accent: #6366f1;
+  --accent-fg: #ffffff;
+  --danger: #dc2626;
+  --ring: #6366f1;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e0e12;
+    --subtle: #141417;
+    --panel: #18181b;
+    --hover: #202024;
+    --border: #26262b;
+    --border-strong: #34343a;
+    --text: #ececef;
+    --muted: #9d9da8;
+    --accent: #818cf8;
+    --accent-fg: #0f0f11;
+    --danger: #f87171;
+    --ring: #818cf8;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-subtle: var(--subtle);
+  --color-panel: var(--panel);
+  --color-hover: var(--hover);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-danger: var(--danger);
+  --color-ring: var(--ring);
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Markdown in issue descriptions/comments */
+.prose-sm p { margin: 0.4em 0; }
+.prose-sm ul { list-style: disc; padding-left: 1.3em; margin: 0.4em 0; }
+.prose-sm ol { list-style: decimal; padding-left: 1.3em; margin: 0.4em 0; }
+.prose-sm code { font-family: var(--font-mono); font-size: 0.9em; background: var(--hover); padding: 0.1em 0.3em; border-radius: 4px; }
+.prose-sm pre { background: var(--hover); padding: 0.6em 0.8em; border-radius: 6px; overflow-x: auto; }
+.prose-sm pre code { background: none; padding: 0; }
+.prose-sm a { color: var(--accent); text-decoration: underline; }
+.prose-sm h1, .prose-sm h2, .prose-sm h3 { font-weight: 600; margin: 0.6em 0 0.3em; }
+.prose-sm blockquote { border-left: 3px solid var(--border-strong); padding-left: 0.8em; color: var(--muted); }
+
+/* cmdk */
+[cmdk-item][data-selected="true"] { background: var(--hover); }
+[cmdk-item][data-disabled="true"] { opacity: 0.45; }
+[cmdk-group-heading] { padding: 8px 12px 4px; font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }

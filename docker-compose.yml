@@ -1,0 +1,21 @@
+﻿services:
+  db:
+    image: postgres:17-alpine
+    container_name: stride-db
+    environment:
+      POSTGRES_USER: stride
+      POSTGRES_PASSWORD: stride
+      POSTGRES_DB: stride
+    ports:
+      - "5433:5432"
+    volumes:
+      - stride-pg:/var/lib/postgresql/data
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stride"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  stride-pg:
