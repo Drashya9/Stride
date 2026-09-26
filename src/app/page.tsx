@@ -1,6 +1,7 @@
 import { Command, GitMerge, Keyboard, Users } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { LegalFooter } from "@/components/legal-page";
 import { Logo } from "@/components/ui/misc";
 import { STATUS_STYLE } from "@/lib/colors";
 import { STATUS_LABEL, type Status } from "@/lib/constants";
@@ -85,6 +86,7 @@ export default async function Home() {
           ))}
         </div>
       </div>
+      <LegalFooter />
     </main>
   );
 }

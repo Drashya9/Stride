@@ -1,4 +1,5 @@
 import { MailOpen, TriangleAlert } from "lucide-react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { devLoginEnabled, oauthProviders } from "@/auth";
 import { ProviderButtons } from "@/components/auth-buttons";
@@ -85,6 +86,17 @@ export default async function LoginPage({
             </form>
           )}
         </div>
+        <p className="mt-4 text-center text-[12px] text-muted">
+          By continuing you agree to the{" "}
+          <Link href="/terms" className="underline hover:text-fg">
+            Terms
+          </Link>{" "}
+          and{" "}
+          <Link href="/privacy" className="underline hover:text-fg">
+            Privacy Policy
+          </Link>
+          .
+        </p>
       </div>
     </main>
   );
