@@ -1,0 +1,12 @@
+# By default GitHub's language detector (Linguist) treats SQL as "generated"
+# and YAML/JSON as "data", hiding them from the repo's language bar even
+# though these are hand-written parts of the stack. Surface them.
+*.sql linguist-detectable=true
+*.yml linguist-detectable=true
+*.yaml linguist-detectable=true
+*.json linguist-detectable=true
+
+# ...except files that are actually generated/vendored and would otherwise
+# dominate the stats with noise instead of real authored code.
+pnpm-lock.yaml linguist-generated=true linguist-detectable=false
+drizzle/meta/** linguist-generated=true linguist-detectable=false
