@@ -47,3 +47,46 @@ test("Try the demo opens a private, pre-filled board without an account", async 
   // Guests are members: the keyboard flows work.
   await createIssueWithKeyboard(page, "My first demo issue");
 });
+
+test("S starts on the current status, and typing filters it", async ({ browser }) => {
+  const { page } = await signIn(browser, "Sid");
+  const { key } = await createWorkspace(page, "Status Team");
+  await createIssueWithKeyboard(page, "Pick a status");
+  const card = page.getByTestId(`card-${key}-1`);
+
+  await card.hover();
+  await page.locator("body").press("s");
+  // Enter on the untouched menu keeps the current status (Todo), not the first option.
+  await expect(page.getByRole("option", { name: /Todo/ })).toHaveAttribute("aria-selected", "true");
+  await page.keyboard.press("Enter");
+  await expect(page.getByTestId("column-todo").getByText("Pick a status")).toBeVisible();
+
+  await card.hover();
+  await page.locator("body").press("s");
+  await page.keyboard.type("done");
+  await page.keyboard.press("Enter");
+  await expect(page.getByTestId("column-done").getByText("Pick a status")).toBeVisible();
+});
+
+test("an open issue has a shareable URL", async ({ browser }) => {
+  const { page } = await signIn(browser, "Lin");
+  const { key, slug } = await createWorkspace(page, "Link Team");
+  await createIssueWithKeyboard(page, "Share me");
+
+  await page.getByTestId(`card-${key}-1`).click();
+  await expect(page).toHaveURL(new RegExp(`\?issue=${key}-1$`));
+  await page.keyboard.press("Escape");
+  await expect(page).toHaveURL(new RegExp(`/w/${slug}$`));
+
+  await page.goto(`/w/${slug}?issue=${key}-1`);
+  await expect(page.getByLabel("Title")).toHaveValue("Share me");
+});
+
+test("the board page doesn't scroll sideways on a phone", async ({ browser }) => {
+  const { page } = await signIn(browser, "Pia");
+  await createWorkspace(page, "A team with quite a long workspace name");
+  await page.setViewportSize({ width: 375, height: 812 });
+  await expect(page.getByRole("button", { name: "New issue" }).first()).toBeInViewport();
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+});

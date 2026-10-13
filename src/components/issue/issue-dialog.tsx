@@ -1,9 +1,10 @@
 "use client";
 
-import { GitMerge, Trash2, X } from "lucide-react";
+import { GitMerge, Link2, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeSanitize from "rehype-sanitize";
+import { toast } from "sonner";
 import {
   useAddComment,
   useBoard,
@@ -14,6 +15,7 @@ import {
   useMoveIssue,
   useUpdateIssue,
 } from "@/client/queries";
+import { issueLink } from "@/client/issue-url";
 import { useUI } from "@/client/stores";
 import { actorName, describeEvent, EventIcon } from "@/components/activity";
 import { Button } from "@/components/ui/button";
@@ -83,6 +85,20 @@ function IssueDetail({ slug, issue, board, onClose }: { slug: string; issue: Iss
             {issue.priority !== "none" && <PriorityBadge priority={issue.priority} />}
           </div>
           <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Copy link to issue"
+              title="Copy link"
+              onClick={() =>
+                navigator.clipboard.writeText(issueLink(issue.identifier)).then(
+                  () => toast.success(`Link to ${issue.identifier} copied`),
+                  () => toast.error("Couldn't copy the link"),
+                )
+              }
+            >
+              <Link2 size={14} />
+            </Button>
             {isAdmin && (
               <Button
                 variant="ghost"

@@ -19,7 +19,15 @@ export function timeAgo(iso: string, now = Date.now()) {
   if (m < 60) return `${m}m ago`;
   const h = Math.round(m / 60);
   if (h < 24) return `${h}h ago`;
-  const d = Math.round(h / 24);
+  // Whole calendar days in local time, so "2d ago" always sits under the day it's grouped in.
+  const d = calendarDaysBetween(Date.parse(iso), now);
   if (d < 30) return `${d}d ago`;
   return new Date(iso).toLocaleDateString();
+}
+
+/** Number of local midnights between two instants (0 = same day, 1 = yesterday, ...). */
+export function calendarDaysBetween(from: number, to: number) {
+  const midnight = (t: number) => new Date(t).setHours(0, 0, 0, 0);
+  // Round, not floor: a DST change makes one "day" 23 or 25 hours long.
+  return Math.round((midnight(to) - midnight(from)) / 86_400_000);
 }

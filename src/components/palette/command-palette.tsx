@@ -35,6 +35,13 @@ export function CommandPalette({ slug }: { slug: string }) {
   const update = useUpdateIssue(slug);
 
   const [query, setQuery] = useState("");
+  // Highlighted item. Each sub-page starts on the issue's current value (so a stray Enter is
+  // a no-op) until the user moves or types; `pageKey` resets that whenever the page changes.
+  const current =
+    page === "status" ? target?.status : page === "priority" ? target?.priority : page === "assignee" ? (target?.assigneeId ?? "unassigned") : undefined;
+  const pageKey = `${open}:${page}:${target?.id ?? ""}`;
+  const [picked, setPicked] = useState({ key: "", value: "" });
+  const selected = picked.key === pageKey ? picked.value : (current ?? picked.value);
   const debounced = useDebounced(query, 150);
   const search = useSearch(slug, page === "root" ? debounced : "");
 
@@ -48,7 +55,10 @@ export function CommandPalette({ slug }: { slug: string }) {
   const run = (c: Cmd) => {
     if (!c.keepPaletteOpen) close();
     reset();
-    c.run();
+    // cmdk highlights the first item whenever the search text changes. Clear the search first and
+    // open sub-pages on the next tick, so they keep starting on the issue's current value.
+    if (c.keepPaletteOpen) setTimeout(c.run, 0);
+    else c.run();
   };
 
   const q = query.trim().toLowerCase();
@@ -62,6 +72,8 @@ export function CommandPalette({ slug }: { slug: string }) {
       onOpenChange={onOpenChange}
       label="Command palette"
       shouldFilter={false}
+      value={selected}
+      onValueChange={(value) => setPicked({ key: pageKey, value })}
       overlayClassName="fixed inset-0 z-40 bg-black/40"
       contentClassName="fixed top-[14vh] left-1/2 z-50 w-[min(620px,calc(100vw-32px))] -translate-x-1/2 overflow-hidden rounded-xl border border-border bg-bg shadow-2xl"
       onKeyDown={(e) => {
@@ -73,7 +85,7 @@ export function CommandPalette({ slug }: { slug: string }) {
     >
       <div className="flex items-center gap-2 border-b border-border px-3">
         {page !== "root" ? (
-          <button type="button" aria-label="Back" onClick={() => setPage("root")} className="text-muted hover:text-fg">
+          <button type="button" tabIndex={-1} aria-label="Back" onClick={() => setPage("root")} className="text-muted hover:text-fg">
             <ChevronLeft size={16} />
           </button>
         ) : (
@@ -83,6 +95,8 @@ export function CommandPalette({ slug }: { slug: string }) {
           <span className="rounded bg-hover px-1.5 py-0.5 font-mono text-[11px] text-muted">{target.identifier}</span>
         )}
         <Command.Input
+          // The Back button comes first in the DOM; without this the dialog focuses it and typing goes nowhere.
+          autoFocus
           value={query}
           onValueChange={setQuery}
           placeholder={

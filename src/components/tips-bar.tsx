@@ -56,12 +56,13 @@ const legend = [
   { label: "Low", cls: PRIORITY_STYLE.low.solid },
 ];
 
+/** Keyboard tips; hidden on phone-sized screens, where there's no keyboard to use them with. */
 export function TipsBar() {
   const dismissed = useTipsDismissed();
   if (dismissed) return null;
 
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-indigo-500/15 bg-gradient-to-r from-indigo-500/8 via-violet-500/6 to-sky-500/8 px-4 py-2 text-[12px]">
+    <div className="hidden flex-wrap items-center gap-x-4 gap-y-2 border-b sm:flex border-indigo-500/15 bg-gradient-to-r from-indigo-500/8 via-violet-500/6 to-sky-500/8 px-4 py-2 text-[12px]">
       <span className="inline-flex items-center gap-1.5 font-semibold text-indigo-700 dark:text-indigo-300">
         <Lightbulb size={14} /> Quick start
       </span>

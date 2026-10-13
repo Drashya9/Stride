@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOutAction } from "@/app/actions";
 import { useCommands, useHotkeys } from "@/client/commands";
+import { useIssueUrl } from "@/client/issue-url";
 import { useBoard, useSyncLatency } from "@/client/queries";
 import { useUI } from "@/client/stores";
 import { DemoBanner } from "@/components/demo-banner";
@@ -24,6 +25,7 @@ export function WorkspaceShell({ slug, children }: { slug: string; children: Rea
   const commands = useCommands(slug);
   useHotkeys(commands);
   useSyncLatency(board);
+  useIssueUrl(board);
   const openCreate = useUI((s) => s.openCreate);
   const openPalette = useUI((s) => s.openPalette);
   const setShortcutsOpen = useUI((s) => s.setShortcutsOpen);
@@ -39,14 +41,14 @@ export function WorkspaceShell({ slug, children }: { slug: string; children: Rea
   ];
 
   return (
-    <div className="flex h-full flex-col">
-      <header className="flex h-13 shrink-0 items-center gap-3 border-b border-border bg-bg px-4">
+    <div className="flex h-full min-w-0 flex-col">
+      <header className="flex h-13 shrink-0 items-center gap-2 border-b border-border bg-bg px-3 sm:gap-3 sm:px-4">
         <Link href="/w" className="rounded p-0.5 text-muted hover:bg-hover hover:text-fg" aria-label="All workspaces">
           <ChevronLeft size={16} />
         </Link>
         <WorkspaceTile keyText={board.workspace.key} size={28} />
-        <span className="font-semibold">{board.workspace.name}</span>
-        <nav className="ml-2 flex gap-1">
+        <span className="hidden min-w-0 truncate font-semibold sm:inline">{board.workspace.name}</span>
+        <nav className="flex shrink-0 gap-1 sm:ml-2">
           {nav.map(({ href, label, Icon, active }) => {
             const isActive = pathname === href;
             return (
@@ -65,26 +67,43 @@ export function WorkspaceShell({ slug, children }: { slug: string; children: Rea
           })}
         </nav>
 
-        <div className="ml-auto flex items-center gap-2">
-          <Button size="sm" onClick={() => openPalette()} className="hidden text-muted md:inline-flex" aria-label="Search">
+        <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <Button size="sm" onClick={() => openPalette()} className="text-muted" aria-label="Search">
             <Search size={14} />
-            <span>Search</span>
-            <Keys combo="mod+k" />
+            <span className="hidden md:inline">Search</span>
+            <span className="hidden md:inline-flex">
+              <Keys combo="mod+k" />
+            </span>
           </Button>
-          <Button size="icon" variant="ghost" onClick={() => setShortcutsOpen(true)} aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)">
+          {/* Keyboard help is no use on a phone. */}
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={() => setShortcutsOpen(true)}
+            aria-label="Keyboard shortcuts"
+            title="Keyboard shortcuts (?)"
+            className="hidden sm:inline-flex"
+          >
             <Keyboard size={15} />
           </Button>
           {tipsDismissed && (
-            <Button size="icon" variant="ghost" onClick={() => setTipsDismissed(false)} aria-label="Show tips" title="Show quick-start tips">
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => setTipsDismissed(false)}
+              aria-label="Show tips"
+              title="Show quick-start tips"
+              className="hidden sm:inline-flex"
+            >
               <CircleHelp size={15} />
             </Button>
           )}
           {hasRole(board.role, "member") && (
-            <Button size="sm" variant="primary" onClick={() => openCreate()} className="shadow-sm">
-              <Plus size={14} /> New issue
+            <Button size="sm" variant="primary" onClick={() => openCreate()} className="shadow-sm" aria-label="New issue">
+              <Plus size={14} /> <span className="hidden sm:inline">New issue</span>
             </Button>
           )}
-          <div className="ml-1 flex items-center gap-2 border-l border-border pl-3">
+          <div className="flex items-center gap-2 border-l border-border pl-2 sm:ml-1 sm:pl-3">
             <Avatar name={me?.name} email={me?.email} image={me?.image} size={24} />
             <div className="hidden leading-tight lg:block">
               <div className="text-[12px] font-medium">{me?.name ?? me?.email}</div>
@@ -101,7 +120,7 @@ export function WorkspaceShell({ slug, children }: { slug: string; children: Rea
       {board.demoExpiresAt && <DemoBanner />}
       <TipsBar />
 
-      <main className="min-h-0 flex-1">{children}</main>
+      <main className="min-h-0 min-w-0 flex-1">{children}</main>
 
       <IssueDialog slug={slug} />
       <CreateIssueDialog slug={slug} />

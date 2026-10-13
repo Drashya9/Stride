@@ -7,7 +7,7 @@ import { actorName, describeEvent, EventIcon } from "@/components/activity";
 import { Select } from "@/components/ui/input";
 import { EVENT_STYLE } from "@/lib/colors";
 import type { EventDTO } from "@/lib/types";
-import { cn, timeAgo } from "@/lib/utils";
+import { calendarDaysBetween, cn, timeAgo } from "@/lib/utils";
 
 /** Stable key for "who did this": the actor's user id, or a bucket for non-member actors. */
 function actorKey(e: EventDTO) {
@@ -15,12 +15,10 @@ function actorKey(e: EventDTO) {
 }
 
 function dayLabel(iso: string) {
-  const d = new Date(iso);
-  const today = new Date();
-  const yesterday = new Date(Date.now() - 86_400_000);
-  if (d.toDateString() === today.toDateString()) return "Today";
-  if (d.toDateString() === yesterday.toDateString()) return "Yesterday";
-  return d.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" });
+  const days = calendarDaysBetween(Date.parse(iso), Date.now());
+  if (days === 0) return "Today";
+  if (days === 1) return "Yesterday";
+  return new Date(iso).toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" });
 }
 
 export function ActivityFeed({ slug }: { slug: string }) {
@@ -42,8 +40,10 @@ export function ActivityFeed({ slug }: { slug: string }) {
 
   const filtered = actorFilter === "all" ? (events ?? []) : (events ?? []).filter((e) => actorKey(e) === actorFilter);
 
+  // Newest first by time (ids already follow time; this also covers any older out-of-order rows).
+  const sorted = [...filtered].sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.id - a.id);
   const groups: { day: string; items: EventDTO[] }[] = [];
-  for (const e of filtered) {
+  for (const e of sorted) {
     const day = dayLabel(e.createdAt);
     const last = groups[groups.length - 1];
     if (last?.day === day) last.items.push(e);

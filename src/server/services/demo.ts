@@ -225,8 +225,9 @@ export async function createDemo(db: DB, { now = new Date(), maxActive = MAX_ACT
     );
     if (commentRows.length) await tx.insert(comments).values(commentRows);
 
-    // Activity feed: who created what, plus the comments.
-    await tx.insert(events).values([
+    // Activity feed: who created what, plus the comments. The feed is ordered by event id,
+    // so insert oldest first — ids then follow time, just as they do for real events.
+    const feed = [
       ...ISSUES.map((seed, i) => ({
         workspaceId: ws.id,
         actorId: ids[seed.creator],
@@ -243,7 +244,8 @@ export async function createDemo(db: DB, { now = new Date(), maxActive = MAX_ACT
         after: { excerpt: c.body.slice(0, 140) },
         createdAt: c.createdAt,
       })),
-    ]);
+    ];
+    await tx.insert(events).values(feed.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()));
 
     return { user: { id: guest.id, name: guest.name }, workspace: { slug: ws.slug, key: ws.key }, expiresAt };
   });

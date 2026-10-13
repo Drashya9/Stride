@@ -97,6 +97,8 @@ export function Board({ slug }: { slug: string }) {
 
   return (
     <DndContext
+      // Fixed id: dnd-kit's accessibility ids otherwise come from a counter that differs between server and client.
+      id="board"
       sensors={sensors}
       collisionDetection={closestCorners}
       onDragStart={onDragStart}
