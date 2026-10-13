@@ -29,6 +29,14 @@ Use a second browser profile / incognito window to be a second user.
 
 Production mode on your machine: `pnpm build && pnpm start`.
 
+### "Try the demo" (no account needed)
+
+With `ALLOW_DEMO=true`, the landing and login pages show a **Try the demo** button. Each click creates a
+brand-new guest and a private, pre-filled workspace (*Campus Eats (demo)*). The guest is a **member**, so all
+keyboard flows work. Guests can't create workspaces, accept invites, invite people or link GitHub repos.
+Everything is deleted 24 hours later, and the session ends at the same time. Expired demos are cleaned up
+whenever a new demo starts, and at most 200 can be live at once. This is safe to enable on a public deployment.
+
 ### Gmail invites + Google sign-in
 
 **1. Send invite emails from your Gmail** (free, no domain needed)

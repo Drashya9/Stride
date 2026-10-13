@@ -37,6 +37,16 @@ export async function devSignIn(formData: FormData) {
   }
 }
 
+/** "Try the demo": a new guest + private demo workspace, then straight onto its board. */
+export async function startDemo() {
+  try {
+    await signIn("demo", { redirectTo: "/demo" });
+  } catch (err) {
+    if (err instanceof AuthError) redirect("/login?error=demo");
+    throw err;
+  }
+}
+
 export async function signOutAction() {
   await signOut({ redirectTo: "/" });
 }

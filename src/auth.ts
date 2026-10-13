@@ -8,6 +8,7 @@ import Google from "next-auth/providers/google";
 import { z } from "zod";
 import { db } from "@/server/db/client";
 import { accounts, sessions, users, verificationTokens } from "@/server/db/schema";
+import { createDemo, DEMO_TTL_MS } from "@/server/services/demo";
 
 /**
  * Dev login: sign in with just an email. Meant for local work and Playwright
@@ -44,6 +45,26 @@ if (devLoginEnabled) {
   );
 }
 
+/**
+ * "Try the demo": signs a visitor in as a brand-new guest in their own throwaway
+ * workspace. It takes no input, so calling it directly can only ever create
+ * another demo — never sign in as an existing user. Opt-in per deployment.
+ */
+export const demoEnabled = process.env.ALLOW_DEMO === "true";
+if (demoEnabled) {
+  providers.push(
+    Credentials({
+      id: "demo",
+      name: "Demo",
+      credentials: {},
+      async authorize() {
+        const { user } = await createDemo(db);
+        return user;
+      },
+    }),
+  );
+}
+
 export const oauthProviders = providers
   .map((p) => (typeof p === "function" ? p() : p))
   .filter((p) => p.type === "oauth" || p.type === "oidc")
@@ -62,6 +83,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   providers,
   pages: { signIn: "/login" },
   callbacks: {
+    jwt({ token, account }) {
+      // Demo sessions end when the demo workspace is deleted. Returning null signs the guest out.
+      if (account?.provider === "demo") token.demoExpiresAt = Date.now() + DEMO_TTL_MS;
+      if (typeof token.demoExpiresAt === "number" && Date.now() > token.demoExpiresAt) return null;
+      return token;
+    },
     session({ session, token }) {
       if (token.sub) session.user.id = token.sub;
       return session;

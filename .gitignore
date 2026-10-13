@@ -12,3 +12,5 @@ next-env.d.ts
 .vercel
 .claude/
 CLAUDE.md
+docs/ARCHITECTURE.md
+docs/Stride-Architecture.docx

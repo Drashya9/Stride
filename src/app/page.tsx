@@ -1,6 +1,8 @@
 import { Command, GitMerge, Keyboard, Users } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { demoEnabled } from "@/auth";
+import { DemoButton } from "@/components/demo-button";
 import { LegalFooter } from "@/components/legal-page";
 import { Logo } from "@/components/ui/misc";
 import { STATUS_STYLE } from "@/lib/colors";
@@ -51,7 +53,11 @@ export default async function Home() {
               >
                 Get started — it’s free
               </Link>
+              {demoEnabled && <DemoButton />}
             </div>
+            {demoEnabled && (
+              <p className="mt-3 text-[12px] text-muted">The demo opens a pre-filled board just for you. No sign-up.</p>
+            )}
           </div>
 
           <div className="grid grid-cols-3 gap-3 rounded-2xl border border-border bg-panel p-3 shadow-2xl shadow-indigo-500/10" aria-hidden>

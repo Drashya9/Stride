@@ -9,6 +9,7 @@ import type { Executor } from "../db/client";
 import { invites, labels, memberships, users, workspaces } from "../db/schema";
 import { BadRequest, Conflict, Forbidden, NotFound } from "../errors";
 import { sendInviteEmail } from "../integrations/email";
+import { assertNotDemo } from "./demo";
 
 const INVITE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const DEFAULT_LABELS = [
@@ -49,6 +50,7 @@ export async function listWorkspaces(ctx: Ctx): Promise<(WorkspaceDTO & { role: 
 
 export async function createWorkspace(ctx: Ctx, input: unknown): Promise<WorkspaceDTO> {
   const data = CreateWorkspaceInput.parse(input);
+  await assertNotDemo(ctx, "create workspaces");
   const [taken] = await ctx.db.select({ id: workspaces.id }).from(workspaces).where(eq(workspaces.key, data.key));
   if (taken) throw new Conflict(`The key "${data.key}" is already used by another workspace`);
 
@@ -197,6 +199,7 @@ export async function previewInvite(db: Executor, token: string) {
 
 export async function acceptInvite(ctx: Ctx, input: unknown) {
   const { token } = AcceptInviteInput.parse(input);
+  await assertNotDemo(ctx, "join other workspaces");
   return ctx.db.transaction(async (tx) => {
     const [invite] = await tx.select().from(invites).where(eq(invites.tokenHash, hashToken(token))).for("update");
     if (!invite || invite.expiresAt < new Date()) throw new NotFound("This invite link is invalid or has expired");

@@ -7,6 +7,7 @@ import { signOutAction } from "@/app/actions";
 import { useCommands, useHotkeys } from "@/client/commands";
 import { useBoard, useSyncLatency } from "@/client/queries";
 import { useUI } from "@/client/stores";
+import { DemoBanner } from "@/components/demo-banner";
 import { CreateIssueDialog } from "@/components/issue/create-issue-dialog";
 import { IssueDialog } from "@/components/issue/issue-dialog";
 import { CommandPalette } from "@/components/palette/command-palette";
@@ -97,6 +98,7 @@ export function WorkspaceShell({ slug, children }: { slug: string; children: Rea
           </div>
         </div>
       </header>
+      {board.demoExpiresAt && <DemoBanner />}
       <TipsBar />
 
       <main className="min-h-0 flex-1">{children}</main>

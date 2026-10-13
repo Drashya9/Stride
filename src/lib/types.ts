@@ -36,6 +36,8 @@ export type BoardDTO = {
   workspace: WorkspaceDTO;
   role: Role;
   me: { id: string };
+  /** ISO time the demo workspace is deleted; null for real workspaces. */
+  demoExpiresAt: string | null;
   members: MemberDTO[];
   labels: LabelDTO[];
   issues: IssueDTO[];

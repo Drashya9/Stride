@@ -45,6 +45,7 @@ export async function getBoard(ctx: Ctx, slug: string): Promise<BoardDTO> {
     workspace: { id: workspace.id, slug: workspace.slug, name: workspace.name, key: workspace.key },
     role,
     me: { id: ctx.userId },
+    demoExpiresAt: workspace.demoExpiresAt?.toISOString() ?? null,
     members: memberRows,
     labels: labelRows.map((l) => ({ id: l.id, name: l.name, color: l.color })),
     issues: issueRows.map((r) => toIssueDTO(r, workspace.key, (byIssue.get(r.id) ?? []).sort())),

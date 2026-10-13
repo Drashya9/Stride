@@ -33,3 +33,17 @@ test("shortcut sheet opens with ?", async ({ browser }) => {
   await page.locator("body").press("?");
   await expect(page.getByRole("heading", { name: "Keyboard shortcuts" })).toBeVisible();
 });
+
+test("Try the demo opens a private, pre-filled board without an account", async ({ page }) => {
+  await page.goto("/");
+  const tryDemo = page.getByRole("button", { name: "Try the demo" });
+  test.skip(!(await tryDemo.count()), "ALLOW_DEMO is not enabled on this server");
+
+  await tryDemo.click();
+  await page.waitForURL(/\/w\/demo-[a-z0-9]+$/, { timeout: 30_000 });
+  await expect(page.getByText("Demo workspace.")).toBeVisible();
+  await expect(page.getByText("Start here: try the keyboard shortcuts")).toBeVisible();
+
+  // Guests are members: the keyboard flows work.
+  await createIssueWithKeyboard(page, "My first demo issue");
+});

@@ -41,6 +41,8 @@ export const users = pgTable("users", {
   email: text("email").unique(),
   emailVerified: timestamp("email_verified", { mode: "date" }),
   image: text("image"),
+  /** Set for "Try the demo" guests and their made-up teammates; the row is deleted after this. */
+  demoExpiresAt: timestamp("demo_expires_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -93,6 +95,8 @@ export const workspaces = pgTable("workspaces", {
   /** Short issue prefix, e.g. "CAP" -> CAP-42 */
   key: text("key").notNull().unique(),
   issueCounter: integer("issue_counter").notNull().default(0),
+  /** Set for throwaway demo workspaces; deleted (with everything in it) after this. */
+  demoExpiresAt: timestamp("demo_expires_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

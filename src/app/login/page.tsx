@@ -1,8 +1,9 @@
 import { MailOpen, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { devLoginEnabled, oauthProviders } from "@/auth";
+import { demoEnabled, devLoginEnabled, oauthProviders } from "@/auth";
 import { ProviderButtons } from "@/components/auth-buttons";
+import { DemoButton } from "@/components/demo-button";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import { Logo } from "@/components/ui/misc";
@@ -49,7 +50,8 @@ export default async function LoginPage({
           )}
           {error && (
             <div className="mt-4 flex items-center gap-2 rounded-lg bg-red-500/10 p-3 text-[13px] text-red-700 dark:text-red-300">
-              <TriangleAlert size={16} /> Sign-in failed. Please try again.
+              <TriangleAlert size={16} />{" "}
+              {error === "demo" ? "The demo couldn't start right now. Please try again in a minute." : "Sign-in failed. Please try again."}
             </div>
           )}
 
@@ -57,7 +59,14 @@ export default async function LoginPage({
             <ProviderButtons providers={oauthProviders} callbackUrl={callbackUrl} hint={hint} />
           </div>
 
-          {!oauthProviders.length && !devLoginEnabled && (
+          {demoEnabled && !fromInvite && (
+            <div className="mt-5 border-t border-border pt-5">
+              <DemoButton className="w-full" />
+              <p className="mt-2 text-center text-[12px] text-muted">A pre-filled board just for you. No account needed.</p>
+            </div>
+          )}
+
+          {!oauthProviders.length && !devLoginEnabled && !demoEnabled && (
             <p className="mt-4 text-[13px] text-muted">
               No sign-in methods are configured. Set AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET (see README).
             </p>
